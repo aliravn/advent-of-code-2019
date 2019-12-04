@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+</head>
+
+
+<body>
+	<div id="outputPart1"></div>
+	<div id="outputPart2"></div>
+
+<script>
+
+// Once you have a working computer, the first step is to restore the gravity assist program (your puzzle input) to the "1202 program alarm" state it had just before the last computer caught fire. To do this, before running the program, replace position 1 with the value 12 and replace position 2 with the value 2. What value is left at position 0 after the program halts?
+
+const input = [1,12,2,3,1,1,2,3,1,3,4,3,1,5,0,3,2,6,1,19,1,19,5,23,2,10,23,27,2,27,13,31,1,10,31,35,1,35,9,39,2,39,13,43,1,43,5,47,1,47,6,51,2,6,51,55,1,5,55,59,2,9,59,63,2,6,63,67,1,13,67,71,1,9,71,75,2,13,75,79,1,79,10,83,2,83,9,87,1,5,87,91,2,91,6,95,2,13,95,99,1,99,5,103,1,103,2,107,1,107,10,0,99,2,0,14,0];
+
+let noun1;
+let verb2 = 0;
+while (verb2 <= 99) {
+	for (noun1 = 0; noun1 <= 99; noun1++) {
+		let testInput = input.slice(0);
+		testInput[1] = noun1;
+		testInput[2] = verb2;
+
+		for (i = 0; i <= testInput.length; i += 4) {
+			if (testInput[i] === 99) {
+				break;
+			} 
+
+			pos1 = testInput[i+1];
+			pos2 = testInput[i+2];
+			pos3 = testInput[i+3];
+
+			if (testInput[i] === 1) {
+				res = testInput[pos1] + testInput[pos2];
+			}
+
+			if (testInput[i] === 2) {
+				res = testInput[pos1] * testInput[pos2];
+			}
+
+			testInput[pos3] = res;
+		}
+
+		if (testInput[0] == 19690720) {
+			console.log(testInput);
+			console.log(noun1, verb2);
+			console.log(100 * noun1 + verb2);
+		} 
+	}	
+	verb2++;
+}
+
+
+
+</script>
+</body>
+
+</html>
