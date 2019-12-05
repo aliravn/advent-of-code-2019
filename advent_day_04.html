@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<div id="outputPart1"></div>
+	<div id="outputPart2"></div>
+<script>
+
+// It is a six-digit number.
+// The value is within the range given in your puzzle input.
+// Two adjacent digits are the same (like 22 in 122345).
+// Going from left to right, the digits never decrease; they only ever increase or stay the same 
+// 111111 meets these criteria (double 11, never decreases).
+// 223450 does not meet these criteria (decreasing pair of digits 50).
+// 123789 does not meet these criteria (no double).
+
+// How many different passwords within the range given in your puzzle input meet these criteria?
+// Your puzzle input is 153517-630395.
+
+let passCount = 0; 
+let increaseCount;
+let doubleCount;
+
+for (let i = 153517; i <= 630395; i++) {
+
+	passCheck = i.toString();
+
+	increaseCount = 0;
+	for (let k = 0; k < 5; k++) {
+		if (passCheck[k] <= passCheck[k+1]) {
+			increaseCount+=1;	
+		}
+	}
+
+	doubleCount = 0;
+	if (increaseCount === 5) {
+		for (let j = 0; j < 5; j++) {
+			if (passCheck[j] == passCheck[j+1]) {
+				doubleCount+=1;
+			} 
+		}
+	}
+
+	if (doubleCount >= 1) {
+		passCount+=1;
+	}
+}
+
+document.getElementById('outputPart1').innerHTML = `
+	<div>Part 1.</div>
+	<div><b>Answer:</b> ${passCount}</div>
+	<hr/>`;
+
+</script>
+
+</body>
+
+</html>
