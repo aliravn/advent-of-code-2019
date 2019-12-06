@@ -23,11 +23,14 @@ let passCount = 0;
 let increaseCount;
 let doubleCount;
 
+let matchCount = 0;
+let passCount2 = 0;
+
 for (let i = 153517; i <= 630395; i++) {
 
 	passCheck = i.toString();
 
-	increaseCount = 0;
+	increaseCount = 0; // check if there are digits that increase or stay the same
 	for (let k = 0; k < 5; k++) {
 		if (passCheck[k] <= passCheck[k+1]) {
 			increaseCount+=1;	
@@ -35,23 +38,40 @@ for (let i = 153517; i <= 630395; i++) {
 	}
 
 	doubleCount = 0;
-	if (increaseCount === 5) {
+	if (increaseCount === 5) { // check if all digits meet the condition
 		for (let j = 0; j < 5; j++) {
-			if (passCheck[j] == passCheck[j+1]) {
+			if (passCheck[j] == passCheck[j+1] && passCheck[j] !== passCheck[j-1]) {
 				doubleCount+=1;
-			} 
+				if (passCheck[j] !== passCheck[j+2]) {
+					matchCount = 1;
+				} 
+			}
 		}
 	}
 
 	if (doubleCount >= 1) {
 		passCount+=1;
 	}
+
+	if (matchCount === 1) {
+		passCount2+=1;
+		matchCount = 0;
+	}
+
 }
+
 
 document.getElementById('outputPart1').innerHTML = `
 	<div>Part 1.</div>
 	<div><b>Answer:</b> ${passCount}</div>
 	<hr/>`;
+
+// part2
+document.getElementById('outputPart2').innerHTML = `
+	<div>Part 2.</div>
+	<div><b>Answer:</b> ${passCount2}</div>
+	<hr/>`;
+
 
 </script>
 
