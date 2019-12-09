@@ -47,10 +47,6 @@ while (i <= input.length) {
 			par3 = 0;
 		}
 	}
-	
-	if (i >= 30) {
-	//debugger;
-	}
 
 	if (opcode === 99) {
 		console.log(opcode);
@@ -60,18 +56,18 @@ while (i <= input.length) {
 	if (opcode === 3) { //opcode = 3 gets input and stores it at specified location
 		inputValueLocation = input[i+1]; //locaion to tore assifne as next number after opcode
 		input[inputValueLocation] = Number(prompt("Please type your input here")); // imput value will be asked from user
-		i += 2; // move onto next opcode
+		i += 2; // move onto next set of instructions
 		continue;
 	}
 
-	if (opcode === 4) {
+	if (opcode === 4) {//opcode = 4 outputs whatever is at the specified location
 		pos1 = input[i+1];
 		if (par1 == 0) {
 			console.log(input[pos1]);
 		} else {
 			console.log(pos1);
 		}
-		i += 2; // move onto next opcode
+		i += 2; // move onto next set of instructions
 		continue;
 	}
 
@@ -99,12 +95,27 @@ while (i <= input.length) {
 			res = val1 * val2;
 		} 
 
-		input[pos3] = res;
+		input[pos3] = res; // saves result of opcode actions to specified location
 
-		i += 4;
+		i += 4; // move onto next set of instructions
 	}
+
+
+	// if (opcode === 5) {if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing}
+	// if (opcode === 6) {if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing}
+	// if (opcode === 7) {if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0}
+	if (opcode === 8) {
+		pos1 = Number(input[i+1]);
+		pos2 = Number(input[i+2]);
+		pos3 = Number(input[i+3]);
+		if (par1 == par2) {
+			input[pos3] = 1
+		}
+		//if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0}
+
 }
 
+// function to reverse the string of the opcode+parameters, to access the parameters easier
 function reverseString(str) {
     var splitString = str.split(""); 
     var reverseArray = splitString.reverse();
