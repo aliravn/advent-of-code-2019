@@ -71,7 +71,7 @@ while (i <= input.length) {
 		continue;
 	}
 
-	if (opcode === 1 || opcode === 2) {
+	if (opcode === 1 || opcode === 2 || opcode >= 5) {
 		pos1 = Number(input[i+1]);
 		pos2 = Number(input[i+2]);
 		pos3 = Number(input[i+3]);	
@@ -87,32 +87,55 @@ while (i <= input.length) {
 			val2 = pos2;
 		}
 
+//if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0}
+		if (opcode === 8) {
+			if (val1 == val2) {
+				input[pos3] = 1;
+			} else {
+				input[pos3] = 0;
+			}
+			i += 4; // move onto next set of instructions	
+		}
+// if (opcode === 7) {if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0}
+		if (opcode === 7) {
+			if (val1 < val2) {
+				input[pos3] = 1;
+			} else {
+				input[pos3] = 0;
+			}
+			i += 4; // move onto next set of instructions
+		}
+
 		if (opcode === 1) {
 			res = val1 + val2;
+			input[pos3] = res; // saves result of opcode actions to specified location
+			i += 4; // move onto next set of instructions
 		} 
 
 		if (opcode === 2) {
 			res = val1 * val2;
-		} 
-
-		input[pos3] = res; // saves result of opcode actions to specified location
-
-		i += 4; // move onto next set of instructions
-	}
-
-
-	// if (opcode === 5) {if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing}
-	// if (opcode === 6) {if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing}
-	// if (opcode === 7) {if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0}
-	if (opcode === 8) {
-		pos1 = Number(input[i+1]);
-		pos2 = Number(input[i+2]);
-		pos3 = Number(input[i+3]);
-		if (par1 == par2) {
-			input[pos3] = 1
+			input[pos3] = res; // saves result of opcode actions to specified location
+			i += 4; // move onto next set of instructions
 		}
-		//if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0}
 
+// if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing
+		if (opcode === 5) {
+			if (val1 !== 0) {
+				i = val2;
+			} else {
+				i += 3; // move onto next set of instructions
+			}
+		}
+
+// if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing
+		if (opcode === 6) {
+			if (val1 == 0) {
+				i = val2;
+			} else {
+				i += 3; // move onto next set of instructions
+			}
+		}
+	}
 }
 
 // function to reverse the string of the opcode+parameters, to access the parameters easier
