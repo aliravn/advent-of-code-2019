@@ -40,24 +40,26 @@ let n1 = targetLayer.filter(item => Number(item) === 1).length;
 let n2 = targetLayer.filter(item => Number(item) === 2).length;
 let res = n1 * n2;
 
-console.log(res);
+//console.log(res);
 
-let picture = imageCode.slice(0, layerSize); // assign first layer as first part of the array
-for (i = 0; i < picture.length; i++) {
-	for (k = 0; k < imageCode.length; k+=picture.length) {
-		let testArray = imageCode.slice(picture.length, picture.length+i);
-		if (Number(picture[i]) === 2) { // check only if the firest layer is transparent
-			if (testArray[i] < picture[i]) {
-				picture[i] = testArray[i];
-			}
-		} else {
+let firstLayer = imageCode.slice(0, layerSize); // assign first layer as first part of the string
+let picture = [];
+console.log(firstLayer);
+
+let t=0;
+while (t < firstLayer.length) { // for each digit of the first layer string
+	for (k = firstLayer.length; k < imageCode.length; k+=firstLayer.length) {
+		let testArray = imageCode.slice(k, k+firstLayer.length); // cut from the next digit after first layer of imageCode sting up to the layerSize
+		debugger;
+		if (Number(testArray[i]) < Number(firstLayer[i])) {
+			picture.push(testArray[i]);
 			continue;
 		}
 	}
-	// take each part of every array that is inside the imageCode
-	// compare the part imadeCode[i]
-}
 
+	t+=1;
+}
+console.log(picture);
 
 </script>
 </body>
