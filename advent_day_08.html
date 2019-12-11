@@ -42,6 +42,23 @@ let res = n1 * n2;
 
 console.log(res);
 
+let picture = imageCode.slice(0, layerSize); // assign first layer as first part of the array
+for (i = 0; i < picture.length; i++) {
+	for (k = 0; k < imageCode.length; k+=picture.length) {
+		let testArray = imageCode.slice(picture.length, picture.length+i);
+		if (Number(picture[i]) === 2) { // check only if the firest layer is transparent
+			if (testArray[i] < picture[i]) {
+				picture[i] = testArray[i];
+			}
+		} else {
+			continue;
+		}
+	}
+	// take each part of every array that is inside the imageCode
+	// compare the part imadeCode[i]
+}
+
+
 </script>
 </body>
 
