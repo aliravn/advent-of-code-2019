@@ -2,6 +2,23 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<style>
+		.a {
+			width: 10px;
+			height: 10px;
+			background-color: black;
+		}
+		.b {
+			width: 10px;
+			height: 10px;
+			background-color: red;
+		}
+		#output {
+			width: 250px;
+			display: flex;
+			flex-wrap: wrap;
+		}
+	</style>
 </head>
 
 
@@ -42,24 +59,37 @@ let res = n1 * n2;
 
 //console.log(res);
 
-let firstLayer = imageCode.slice(0, layerSize); // assign first layer as first part of the string
-let picture = [];
+let firstLayer = Array.from(imageCode.slice(0, layerSize)); // assign first layer as first part of the string
 console.log(firstLayer);
+let picture = [];
 
 let t=0;
 while (t < firstLayer.length) { // for each digit of the first layer string
 	for (k = firstLayer.length; k < imageCode.length; k+=firstLayer.length) {
-		let testArray = imageCode.slice(k, k+firstLayer.length); // cut from the next digit after first layer of imageCode sting up to the layerSize
-		debugger;
-		if (Number(testArray[i]) < Number(firstLayer[i])) {
-			picture.push(testArray[i]);
-			continue;
+		let testArray = Array.from(imageCode.slice(k, k+firstLayer.length));
+		if (Number(firstLayer[t]) === 2) {
+			if (Number(testArray[t]) < Number(firstLayer[t])) {
+				picture.push(testArray[t]);
+				break;
+			} 
+		} else {
+			picture[t] = firstLayer[t];
 		}
 	}
 
 	t+=1;
 }
-console.log(picture);
+for (y = 0; y < picture.length; y++) {
+	if (y%25 == 0) {
+		document.getElementById('output').innerHTML += '</br>';
+	} 
+
+	if (picture[y] == 0) {
+		document.getElementById('output').innerHTML += '<div class="a"></div>';
+	} else {
+		document.getElementById('output').innerHTML += '<div class="b"></div>';
+	}
+}
 
 </script>
 </body>
