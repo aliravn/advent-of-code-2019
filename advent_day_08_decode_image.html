@@ -5,12 +5,12 @@
 	<style>
 		.a {
 			width: 10px;
-			height: 10px;
+			height: 15px;
 			background-color: black;
 		}
 		.b {
 			width: 10px;
-			height: 10px;
+			height: 15px;
 			background-color: red;
 		}
 		#output {
@@ -80,11 +80,11 @@ while (t < firstLayer.length) { // for each digit of the first layer string
 	t+=1;
 }
 for (y = 0; y < picture.length; y++) {
-	if (y%25 == 0) {
+	if (y%25 === 0) {
 		document.getElementById('output').innerHTML += '</br>';
 	} 
 
-	if (picture[y] == 0) {
+	if (parseInt(picture[y], 10) === 0) {
 		document.getElementById('output').innerHTML += '<div class="a"></div>';
 	} else {
 		document.getElementById('output').innerHTML += '<div class="b"></div>';
