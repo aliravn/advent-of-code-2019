@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+
+
+<body>
+    <div id="outputPart1"></div>
+    <div id="outputPart2"></div>
+
+<script>
+
+// var permutation = function (collection){
+//     var current,
+//         subarray,
+//         result = [],
+//         currentArray = [],
+//         newResultArray = [];
+
+//     if (collection.length){
+//         current = collection.shift();
+//         result = permutation(collection);
+
+//         currentArray.push(current);
+
+//         result.map(function(list) {
+//             newResultArray.push(list.slice(0));
+//             list.push(current);
+//         });
+
+//         result.push(currentArray);
+//         result = result.concat(newResultArray);
+//     }
+
+//     return result;
+// };
+
+// console.log(permutation(['a','b','c','d']));
+
+const phases = [0,1,2,3,4];
+const findAllSequencesOfPhases = list => {
+    // Empty list has one permutation
+    if (list.length == 0)
+        return [[]];
+        
+        
+    let result = [];
+    
+    for (let i=0; i<list.length; i++) {
+        // Clone list (kind of)
+        let copy = Object.create(list);
+
+        // Cut one element from list
+        let head = copy.splice(i, 1);
+        
+        // Permute rest of list
+        let rest = findAllSequencesOfPhases(copy);
+        
+        // Add head to each permutation of rest of list
+        for (let j=0; j<rest.length; j++)
+        {
+            let next = head.concat(rest[j]);
+            result.push(next);
+        }
+    }
+
+    return result;
+}
+
+const possibleCombinations = findAllSequencesOfPhases(phases);
+
+</script>
+</body>
+</html>

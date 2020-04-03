@@ -4,5 +4,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="@types/babel-plugin-syntax-jsx" level="application" />
+    <orderEntry type="library" name="@types/es6-collections" level="application" />
+    <orderEntry type="library" name="@types/eslint-plugin-prettier" level="application" />
   </component>
 </module>
