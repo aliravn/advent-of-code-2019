@@ -12,6 +12,7 @@
 <script>
 
 const phases = [0,1,2,3,4];
+
 const findAllSequencesOfPhases = list => {
     // Empty list has one permutation
     if (list.length === 0)
@@ -30,7 +31,6 @@ const findAllSequencesOfPhases = list => {
     }
     return result;
 }
-
 const possibleCombinations = findAllSequencesOfPhases(phases);
 console.log(possibleCombinations);
 
@@ -63,12 +63,19 @@ for (k = 0; k < possibleCombinations.length; k++) {
 			let par1 = 0;
 			let par2 = 0;
 			let par3 = 0;
+			let pos1 = 0;
+			let pos2 = 0;
+			let pos3 = 0;
+			let val1 = 0;
+			let val2 = 0;
+			let val3 = 0;
+
 			if (input[i].toString().length === 1 || input[i].toString().length === 2) {
 				opcode = input[i]; // opcode is either 1/2/3/4 or 99, does not make sence to have 2-digit opcode for 01/02.. etc
 			} else if (input[i].toString().length > 2) {
 				opcode = Number(input[i].toString().slice(-1));
 				// reverse the input containing opcode, find parameters for pos/val parameters for instructions
-				reverseArray = reverseString(input[i].toString());
+				const reverseArray = reverseString(input[i].toString());
 				par1 = Number(reverseArray[2]); // 1st param is valid for any long opcode
 				if (reverseArray[3] !== undefined) { // 2nd param may be present for opcode 1 or 2, if not == zero
 					par2 = Number(reverseArray[3]);
@@ -87,7 +94,7 @@ for (k = 0; k < possibleCombinations.length; k++) {
 			}
 
 			if (opcode === 3) { // opcode = 3 gets input and stores it at specified location
-				inputValueLocation = input[i + 1]; // location to store assigned as next number after opcode
+				const inputValueLocation = input[i + 1]; // location to store assigned as next number after opcode
 				if (i === 0) {
 					input[inputValueLocation] = possibleCombinations[k][j]; // input value will be asked from user
 				} else {
@@ -99,7 +106,7 @@ for (k = 0; k < possibleCombinations.length; k++) {
 
 			if (opcode === 4) { // opcode = 4 outputs whatever is at the specified location
 				pos1 = input[i + 1];
-				if (par1 == 0) {
+				if (par1 === 0) {
 					// console.log(input[pos1]);
 					outputToNextThruster = input[pos1];
 				} else {
@@ -187,8 +194,7 @@ for (k = 0; k < possibleCombinations.length; k++) {
 // function to reverse the string of the opcode+parameters, to access the parameters easier
 function reverseString(str) {
     const splitString = str.split("");
-    const reverseArray = splitString.reverse();
-    return reverseArray;
+    return splitString.reverse();
 }
 
 console.log('Max is: ' + Math.max(...allOutputResultsForAllCombinations));
