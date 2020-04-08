@@ -3,22 +3,18 @@
 <head>
 	<meta charset="utf-8">
 </head>
-
-
 <body>
 	<div id="outputPart1"></div>
 	<div id="outputPart2"></div>
-
 <script>
 
-const phases = [0,1,2,3,4]; // part 1
-// const phases = [5,6,7,8,9]; // part 2
-
+// const phases = [0,1,2,3,4]; // part 1
+const phases = [5,6,7,8,9]; // part 2
 const findAllSequencesOfPhases = list => {
     // Empty list has one permutation
     if (list.length === 0)
         return [[]];
-
+	// Not empty list has one permutation
     let result = [];
     for (let i=0; i < list.length; i++) {
         let copy = Object.create(list);
@@ -33,27 +29,142 @@ const findAllSequencesOfPhases = list => {
     return result;
 }
 const possibleCombinations = findAllSequencesOfPhases(phases);
-// console.log(possibleCombinations);
 
 // function to reverse the string of the opcode+parameters, to access the parameters easier
-const reverseString = (str) => {
-    const splitString = str.split("");
-    return splitString.reverse();
+const reverseString = str => str.split("").reverse();
+
+const initialInput = [3,8,1001,8,10,8,105,1,0,0,21,30,47,64,81,98,179,260,341,422,99999,3,9,1001,9,5,9,4,9,99,3,9,1002,9,5,9,101,4,9,9,102,2,9,9,4,9,99,3,9,102,3,9,9,101,2,9,9,1002,9,3,9,4,9,99,3,9,1001,9,5,9,1002,9,3,9,1001,9,3,9,4,9,99,3,9,1002,9,3,9,101,2,9,9,102,5,9,9,4,9,99,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,99,3,9,101,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,99,3,9,101,1,9,9,4,9,3,9,101,2,9,9,4,9,3,9,101,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,101,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,99,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,2,9,9,4,9,99,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,99];
+
+function intComputer(i, input, phase, outputToNextThruster, allOutputResultsForAllCombinations) {
+	while (i <= input.length) {
+		// define the opcode in the first position of new set of instructions
+		let par1 = 0, par2 = 0, par3 = 0, pos1 = 0, pos2 = 0, pos3 = 0, val1 = 0, val2 = 0, val3 = 0;
+		// opcode is either 1/2/3/4 or 99, does not make sence to have 2-digit opcode for 01/02.. etc
+		if (input[i].toString().length === 1 || input[i].toString().length === 2) {
+			opcode = input[i];
+		} else if (input[i].toString().length > 2) {
+			opcode = Number(input[i].toString().slice(-1));
+			// reverse the input containing opcode, find parameters for pos/val parameters for instructions
+			const reverseArray = reverseString(input[i].toString());
+			// 1st param is valid for any long opcode
+			par1 = Number(reverseArray[2]);
+			// 2nd param may be present for opcode 1 or 2, if not == zero
+			if (reverseArray[3] !== undefined) {
+				par2 = Number(reverseArray[3]);
+			} else {
+				par2 = 0;
+			}
+			// 3rd param may be present for opcode 1 or 2, if not == zero
+			if (reverseArray[4] !== undefined) {
+				par3 = Number(reverseArray[4]);
+			} else {
+				par3 = 0;
+			}
+		}
+
+		if (opcode === 99) {
+			allOutputResultsForAllCombinations.push(outputToNextThruster);
+
+			return 'stop';
+		}
+
+		if (opcode === 3) { // opcode = 3 gets input and stores it at specified location
+			const inputValueLocation = input[i + 1]; // location to store assigned as next number after opcode
+			if (i === 0) {
+				input[inputValueLocation] = phase; // input value will be asked from user
+			} else {
+				input[inputValueLocation] = outputToNextThruster;
+			}
+			i += 2; // move onto next set of instructions
+			continue;
+		}
+
+		if (opcode === 4) { // opcode = 4 outputs whatever is at the specified location
+			pos1 = input[i + 1];
+			if (par1 === 0) {
+				outputToNextThruster = input[pos1];
+			} else {
+				outputToNextThruster = pos1;
+			}
+
+			i += 2; // move onto next set of instructions
+
+			return [outputToNextThruster, i];
+		}
+
+		if (opcode === 1 || opcode === 2 || opcode >= 5) {
+			pos1 = Number(input[i + 1]);
+			pos2 = Number(input[i + 2]);
+			pos3 = Number(input[i + 3]);
+
+			if (par1 === 0) {
+				val1 = input[pos1];
+			} else {
+				val1 = pos1;
+			}
+			if (par2 === 0) {
+				val2 = input[pos2];
+			} else {
+				val2 = pos2;
+			}
+
+			//if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.
+			// Otherwise, it stores 0}
+			if (opcode === 8) {
+				if (val1 === val2) {
+					input[pos3] = 1;
+				} else {
+					input[pos3] = 0;
+				}
+				i += 4; // move onto next set of instructions
+			}
+			// if (opcode === 7) {if the first parameter is less than the second parameter,
+			// it stores 1 in the position given by the third parameter.
+			// Otherwise, it stores 0}
+			if (opcode === 7) {
+				if (val1 < val2) {
+					input[pos3] = 1;
+				} else {
+					input[pos3] = 0;
+				}
+				i += 4; // move onto next set of instructions
+			}
+
+			if (opcode === 1) {
+				res = val1 + val2;
+				input[pos3] = res; // saves result of opcode actions to specified location
+				i += 4; // move onto next set of instructions
+			}
+
+			if (opcode === 2) {
+				res = val1 * val2;
+				input[pos3] = res; // saves result of opcode actions to specified location
+				i += 4; // move onto next set of instructions
+			}
+
+			// if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter.
+			// Otherwise, it does nothing
+			if (opcode === 5) {
+				if (val1 !== 0) {
+					i = val2;
+				} else {
+					i += 3; // move onto next set of instructions
+				}
+			}
+
+			// if the first parameter is zero, it sets the instruction pointer to the value from the second parameter.
+			// Otherwise, it does nothing
+			if (opcode === 6) {
+				if (val1 === 0) {
+					i = val2;
+				} else {
+					i += 3; // move onto next set of instructions
+				}
+			}
+		}
+	}
 }
 
-const input = [3,8,1001,8,10,8,105,1,0,0,21,30,47,64,81,98,179,260,341,422,99999,3,9,1001,9,5,9,4,9,99,3,9,1002,9,5,9,101,4,9,9,102,2,9,9,4,9,99,3,9,102,3,9,9,101,2,9,9,1002,9,3,9,4,9,99,3,9,1001,9,5,9,1002,9,3,9,1001,9,3,9,4,9,99,3,9,1002,9,3,9,101,2,9,9,102,5,9,9,4,9,99,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,99,3,9,101,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,99,3,9,101,1,9,9,4,9,3,9,101,2,9,9,4,9,3,9,101,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,101,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,99,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,2,9,9,4,9,99,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,99];
-
-// Test 1: Max is 43210 (from phase setting sequence 4,3,2,1,0) 
-// const input = [3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0];
-
-// Test 2: Max is 54321 (from phase setting sequence 0,1,2,3,4)
-// const input = [3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0];
-
-// Test 3: Max is 65210 (from phase setting sequence 1,0,4,3,2)
-// const input = [3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0];
-
-// Test 2.1: Max is 139629729 (from phase setting sequence 9,8,7,6,5)
-// const input = [3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5]
 
 let res; 
 let opcode;
@@ -62,144 +173,33 @@ let allOutputResultsForAllCombinations = [];
 
 // loop to go through all combinations of phases sequences (120)
 for (let k = 0; k < possibleCombinations.length; k++) {
-
+	
 	let outputToNextThruster = 0;
+	// need to clone array, as objects are copied by reference and the initial array will be altered too
+	// easiest way to copy is spreading the initial array
+	let thrusterInput = [[...initialInput],[...initialInput],[...initialInput],[...initialInput],[...initialInput]];
+	let index = [0,0,0,0,0];
 
 	// loop to go through each combination of phases sequences (5)
-	for (let j = 0; j < possibleCombinations[k].length; j++) {
+	let j = 0;	
+	while (j < possibleCombinations[k].length) {
+		const result = intComputer(index[j], thrusterInput[j], possibleCombinations[k][j], outputToNextThruster, allOutputResultsForAllCombinations);
 
-		// loop to go through the const input and it's instructions = INTCOMPUTER
-		let i = 0;
-		while (i <= input.length) {
+		outputToNextThruster = result[0];
+		index[j] = result[1];
 
-			// define the opcode in the first position of new set of instructions
-			let par1 = 0, par2 = 0, par3 = 0, pos1 = 0, pos2 = 0, pos3 = 0, val1 = 0, val2 = 0, val3 = 0;
-
-			if (input[i].toString().length === 1 || input[i].toString().length === 2) {
-				opcode = input[i]; // opcode is either 1/2/3/4 or 99, does not make sence to have 2-digit opcode for 01/02.. etc
-			} else if (input[i].toString().length > 2) {
-				opcode = Number(input[i].toString().slice(-1));
-				// reverse the input containing opcode, find parameters for pos/val parameters for instructions
-				const reverseArray = reverseString(input[i].toString());
-				par1 = Number(reverseArray[2]); // 1st param is valid for any long opcode
-				if (reverseArray[3] !== undefined) { // 2nd param may be present for opcode 1 or 2, if not == zero
-					par2 = Number(reverseArray[3]);
-				} else {
-					par2 = 0;
-				}
-				if (reverseArray[4] !== undefined) { // 3rd param may be present for opcode 1 or 2, if not == zero
-					par3 = Number(reverseArray[4]);
-				} else {
-					par3 = 0;
-				}
-			}
-
-			if (opcode === 99) {
-				allOutputResultsForAllCombinations.push(outputToNextThruster);
-				break;
-			}
-
-			if (opcode === 3) { // opcode = 3 gets input and stores it at specified location
-				const inputValueLocation = input[i + 1]; // location to store assigned as next number after opcode
-				if (i === 0) {
-					input[inputValueLocation] = possibleCombinations[k][j]; // input value will be asked from user
-				} else {
-					input[inputValueLocation] = outputToNextThruster;
-				}
-				i += 2; // move onto next set of instructions
-				continue;
-			}
-
-			if (opcode === 4) { // opcode = 4 outputs whatever is at the specified location
-				pos1 = input[i + 1];
-				if (par1 === 0) {
-					// console.log(input[pos1]);
-					outputToNextThruster = input[pos1];
-				} else {
-					// console.log(pos1);
-					outputToNextThruster = pos1;
-				}
-				// if (j === 4) {
-				// 	allOutputResultsForAllCombinations.push(outputToNextThruster);
-				// }
-				i += 2; // move onto next set of instructions
-				continue;
-			}
-
-			if (opcode === 1 || opcode === 2 || opcode >= 5) {
-				pos1 = Number(input[i + 1]);
-				pos2 = Number(input[i + 2]);
-				pos3 = Number(input[i + 3]);
-
-				if (par1 === 0) {
-					val1 = input[pos1];
-				} else {
-					val1 = pos1;
-				}
-				if (par2 === 0) {
-					val2 = input[pos2];
-				} else {
-					val2 = pos2;
-				}
-
-				//if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.
-				// Otherwise, it stores 0}
-				if (opcode === 8) {
-					if (val1 === val2) {
-						input[pos3] = 1;
-					} else {
-						input[pos3] = 0;
-					}
-					i += 4; // move onto next set of instructions
-				}
-				// if (opcode === 7) {if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter.
-				// Otherwise, it stores 0}
-				if (opcode === 7) {
-					if (val1 < val2) {
-						input[pos3] = 1;
-					} else {
-						input[pos3] = 0;
-					}
-					i += 4; // move onto next set of instructions
-				}
-
-				if (opcode === 1) {
-					res = val1 + val2;
-					input[pos3] = res; // saves result of opcode actions to specified location
-					i += 4; // move onto next set of instructions
-				}
-
-				if (opcode === 2) {
-					res = val1 * val2;
-					input[pos3] = res; // saves result of opcode actions to specified location
-					i += 4; // move onto next set of instructions
-				}
-
-				// if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter.
-				// Otherwise, it does nothing
-				if (opcode === 5) {
-					if (val1 !== 0) {
-						i = val2;
-					} else {
-						i += 3; // move onto next set of instructions
-					}
-				}
-
-				// if the first parameter is zero, it sets the instruction pointer to the value from the second parameter.
-				// Otherwise, it does nothing
-				if (opcode === 6) {
-					if (val1 === 0) {
-						i = val2;
-					} else {
-						i += 3; // move onto next set of instructions
-					}
-				}
-			}
+		if (result === 'stop') {
+			break;
 		}
+
+		if (j === 4) {
+			j = 0;
+		} else {
+			j++;
+		}
+
 	}
 }
-
-
 
 console.log('Max is: ' + Math.max(...allOutputResultsForAllCombinations));
 </script>
