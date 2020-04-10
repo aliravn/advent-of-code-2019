@@ -30,7 +30,7 @@ while (i <= input.length) {
 	let par2 = 0;
 	let par3 = 0;
 	if (input[i].toString().length === 1 || input[i].toString().length === 2) {
-		opcode = input[i]; // opcode is either 1/2/3/4 or 99, does not make sence to have 2-digit opcode for 01/02.. etc
+		opcode = input[i]; // opcode is either one digit or 99, does not make sense to have 2-digit opcode for 01/02.. etc
 	} else if (input[i].toString().length > 2) {
 		opcode = Number(input[i].toString().slice(-1));
 		// reverse the input containing opcode, find parameters for pos/val parameters for instructions

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<div id="outputPart1"></div>
+	<div id="outputPart2"></div>
+<script>
+
+intComputer = (i, input, phase, outputToNextThruster, allOutputResultsForAllCombinations) => {
+	while (i <= input.length) {
+		// define the opcode in the first position of new set of instructions
+		let par1 = 0, par2 = 0, par3 = 0, pos1 = 0, pos2 = 0, pos3 = 0, val1 = 0, val2 = 0, val3 = 0;
+		// opcode is either 1/2/3/4 or 99, does not make sence to have 2-digit opcode for 01/02.. etc
+		if (input[i].toString().length === 1 || input[i].toString().length === 2) {
+			opcode = input[i];
+		} else if (input[i].toString().length > 2) {
+			opcode = Number(input[i].toString().slice(-1));
+			// reverse the input containing opcode, find parameters for pos/val parameters for instructions
+			const reverseArray = reverseString(input[i].toString());
+			// 1st param is valid for any long opcode
+			par1 = Number(reverseArray[2]);
+			// 2nd param may be present for opcode 1 or 2, if not == zero
+			if (reverseArray[3] !== undefined) {
+				par2 = Number(reverseArray[3]);
+			} else {
+				par2 = 0;
+			}
+			// 3rd param may be present for opcode 1 or 2, if not == zero
+			if (reverseArray[4] !== undefined) {
+				par3 = Number(reverseArray[4]);
+			} else {
+				par3 = 0;
+			}
+		}
+
+		if (opcode === 99) {
+			allOutputResultsForAllCombinations.push(outputToNextThruster);
+
+			return 'stop';
+		}
+
+		if (opcode === 3) { // opcode = 3 gets input and stores it at specified location
+			const inputValueLocation = input[i + 1]; // location to store assigned as next number after opcode
+			if (i === 0) {
+				input[inputValueLocation] = phase; // input value will be asked from user
+			} else {
+				input[inputValueLocation] = outputToNextThruster;
+			}
+			i += 2; // move onto next set of instructions
+			continue;
+		}
+
+		if (opcode === 4) { // opcode = 4 outputs whatever is at the specified location
+			pos1 = input[i + 1];
+			if (par1 === 0) {
+				outputToNextThruster = input[pos1];
+			} else {
+				outputToNextThruster = pos1;
+			}
+
+			i += 2; // move onto next set of instructions
+
+			return [outputToNextThruster, i];
+		}
+
+		if (opcode === 1 || opcode === 2 || opcode >= 5) {
+			pos1 = Number(input[i + 1]);
+			pos2 = Number(input[i + 2]);
+			pos3 = Number(input[i + 3]);
+
+			if (par1 === 0) {
+				val1 = input[pos1];
+			} else {
+				val1 = pos1;
+			}
+			if (par2 === 0) {
+				val2 = input[pos2];
+			} else {
+				val2 = pos2;
+			}
+
+			//if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.
+			// Otherwise, it stores 0}
+			if (opcode === 8) {
+				if (val1 === val2) {
+					input[pos3] = 1;
+				} else {
+					input[pos3] = 0;
+				}
+				i += 4; // move onto next set of instructions
+			}
+			// if (opcode === 7) {if the first parameter is less than the second parameter,
+			// it stores 1 in the position given by the third parameter.
+			// Otherwise, it stores 0}
+			if (opcode === 7) {
+				if (val1 < val2) {
+					input[pos3] = 1;
+				} else {
+					input[pos3] = 0;
+				}
+				i += 4; // move onto next set of instructions
+			}
+
+			if (opcode === 1) {
+				res = val1 + val2;
+				input[pos3] = res; // saves result of opcode actions to specified location
+				i += 4; // move onto next set of instructions
+			}
+
+			if (opcode === 2) {
+				res = val1 * val2;
+				input[pos3] = res; // saves result of opcode actions to specified location
+				i += 4; // move onto next set of instructions
+			}
+
+			// if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter.
+			// Otherwise, it does nothing
+			if (opcode === 5) {
+				if (val1 !== 0) {
+					i = val2;
+				} else {
+					i += 3; // move onto next set of instructions
+				}
+			}
+
+			// if the first parameter is zero, it sets the instruction pointer to the value from the second parameter.
+			// Otherwise, it does nothing
+			if (opcode === 6) {
+				if (val1 === 0) {
+					i = val2;
+				} else {
+					i += 3; // move onto next set of instructions
+				}
+			}
+		}
+	}
+}
+
+
+</script>
+</body>
+
+</html>
