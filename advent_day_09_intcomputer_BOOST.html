@@ -72,7 +72,7 @@ intComputer = (i, input, output, relativeBase) => {
 			} else if ( mode1 === 2) {
 				inputValueLocation = param1 + relativeBase;
 			}
-			input[inputValueLocation] = 1;
+			input[inputValueLocation] = Number(prompt("Please type your input here"));
 			i += 2; // move onto next set of instructions
 			continue;
 		}
