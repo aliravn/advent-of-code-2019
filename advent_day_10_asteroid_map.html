@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+</head>
+
+<body>
+	<div id="output"></div>
+
+<script>
+    const mapGrid = ["..#..###....#####....###........#",".##.##...#.#.......#......##....#","#..#..##.#..###...##....#......##","..####...#..##...####.#.......#.#","...#.#.....##...#.####.#.###.#..#","#..#..##.#.#.####.#.###.#.##.....","#.##...##.....##.#......#.....##.",".#..##.##.#..#....#...#...#...##.",".#..#.....###.#..##.###.##.......",".##...#..#####.#.#......####.....","..##.#.#.#.###..#...#.#..##.#....",".....#....#....##.####....#......",".#..##.#.........#..#......###..#","#.##....#.#..#.#....#.###...#....",".##...##..#.#.#...###..#.#.#..###",".#..##..##...##...#.#.#...#..#.#.",".#..#..##.##...###.##.#......#...","...#.....###.....#....#..#....#..",".#...###..#......#.##.#...#.####.","....#.##...##.#...#........#.#...","..#.##....#..#.......##.##.....#.",".#.#....###.#.#.#.#.#............","#....####.##....#..###.##.#.#..#.","......##....#.#.#...#...#..#.....","...#.#..####.##.#.........###..##",".......#....#.##.......#.#.###...","...#..#.#.........#...###......#.",".#.##.#.#.#.#........#.#.##..#...",".......#.##.#...........#..#.#...",".####....##..#..##.#.##.##..##...",".#.#..###.#..#...#....#.###.#..#.","............#...#...#.......#.#..",".........###.#.....#..##..#.##..."];
+
+	// function to translate puzzle input into coordinates of all asteroids
+    translateMapIntoCoordinates = (grid) => {
+		const coordinates = [];
+		for (let i = 0; i < grid.length; i++) {
+			const gridLine = grid[i];
+			for (let j = 0; j < gridLine.length; j++) {
+				if (gridLine[j] === "#") {
+					coordinates.push([j,i]);
+				}
+			}
+		}
+		return coordinates;
+	};
+	const asteroids = translateMapIntoCoordinates(mapGrid);
+	console.log(asteroids);
+
+	// find all possible angles for all asteroids
+	getCosinusForEachAsteroidPair = (asteroids) => {
+		let result = [];
+		for (let j = 0; j < asteroids.length; j++) {
+			let anglesForEachAsteroid = [];
+			const asteroid = asteroids[j];
+			for (let i = 0; i < asteroids.length; i++) {
+				if (i === j) { continue; }
+				const a = Math.sqrt(
+					Math.pow((-1 - asteroid[0]), 2)
+				);
+				const b = Math.sqrt(
+					Math.pow((asteroid[0] - asteroids[i][0]), 2) +
+					Math.pow((asteroid[1] - asteroids[i][1]), 2)
+				);
+				const c = Math.sqrt(
+					Math.pow((-1 - asteroids[i][0]), 2) +
+					Math.pow((asteroid[1] - asteroids[i][1]), 2)
+				);
+				let cos = Number(((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b)).toFixed(4));
+
+				// check if asteroids are on the same axis, but in different directions
+				if (asteroid[1] > asteroids[i][1]) {
+					cos = `a${cos}`;
+				} else if (asteroid[1] < asteroids[i][1]) {
+					cos = `b${cos}`;
+				} else if (asteroid[0] > asteroids[i][0]) {
+					cos = `c${cos}`;
+				}else if (asteroid[0] < asteroids[i][0]) {
+					cos = `d${cos}`;
+				}
+				anglesForEachAsteroid.push(cos);
+			}
+			result[j] = anglesForEachAsteroid;
+		}
+		return result;
+	};
+	const listOfAllAngles = getCosinusForEachAsteroidPair(asteroids);
+	// console.log(listOfAllAngles);
+
+	// find number of unique angles for each asteroid
+	const countList = [];
+	for (let i = 0; i < listOfAllAngles.length; i++) {
+		const unique = listOfAllAngles[i].filter((v, i, a) => a.indexOf(v) === i);
+		countList.push(unique.length);
+	}
+	// console.log(countList);
+
+	// find the asteroid, that can detect max number of other asteroids
+	const max = Math.max(...countList);
+	// const where = countList.indexOf(max);
+	console.log(`Max detected asteroids: ${max}`);
+	// console.log(asteroids[where]); coordinates of the station
+</script>
+</body>
+</html>
