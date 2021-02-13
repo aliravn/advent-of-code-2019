@@ -33,6 +33,7 @@
 			let anglesForEachAsteroid = [];
 			const asteroid = asteroids[j];
 			for (let i = 0; i < asteroids.length; i++) {
+				// check if it is the same asteroid, then no calc is needed
 				if (i === j) { continue; }
 				const a = Math.sqrt(
 					Math.pow((-1 - asteroid[0]), 2)
@@ -76,9 +77,32 @@
 
 	// find the asteroid, that can detect max number of other asteroids
 	const max = Math.max(...countList);
-	// const where = countList.indexOf(max);
-	console.log(`Max detected asteroids: ${max}`);
-	// console.log(asteroids[where]); coordinates of the station
+	document.getElementById('output').innerHTML = `Max detected asteroids: ${max}`;
+
+	// get location of the asteroid, where to place the laser and the station
+	const where = countList.indexOf(max);
+	console.log(`Laser should be placed at: (${asteroids[where]})` ); // coordinates of the station
+
+// PART 2 STARTS HERE
+
+// 1) sort all asteroids by 4 sectors based on their coordinates
+// 2) inside the sector: 
+// 		- calc COS to the station
+//		- find matching COS
+// 		- find which of matches is closer to the station (will be detected first)
+//		- remove the matches that are far away
+// 		- determine the number of asteroids in sector
+// 3) determine in which sector the 200th asteroid will be (
+//	  eg. if 1st sector doesn't have 200 detected asteroids, it will be cleaned first and we don't care in which order
+// 4) sort the asteroids within selected sector by ascending(180-360)/descending(0-180) COS
+// 5) find the one that matches the 200th position
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
