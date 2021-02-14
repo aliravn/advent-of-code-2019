@@ -24,7 +24,7 @@
 		return coordinates;
 	};
 	const asteroids = translateMapIntoCoordinates(mapGrid);
-	console.log(asteroids);
+	//console.log(">>> asteroids >>> ", asteroids);
 
 	// find all possible angles for all asteroids
 	getCosinusForEachAsteroidPair = (asteroids) => {
@@ -81,11 +81,12 @@
 
 	// get location of the asteroid, where to place the laser and the station
 	const where = countList.indexOf(max);
-	console.log(`Laser should be placed at: (${asteroids[where]})` ); // coordinates of the station
+	const laserLocation = asteroids[where];
+	console.log(`Laser should be placed at: (${laserLocation})` ); // coordinates of the station
 
 // PART 2 STARTS HERE
 
-// 1) sort all asteroids by 4 sectors based on their coordinates
+// 1) sort all asteroids by 4 sectors based on their coordinates / done
 // 2) inside the sector: 
 // 		- calc COS to the station
 //		- find matching COS
@@ -98,9 +99,41 @@
 // 5) find the one that matches the 200th position
 
 
+// const laserLocation = asteroids[where];
+// const laserLocation = [27,19];
+let s1=[], s2=[], s3=[], s4=[];
 
+sortAsteroidsBySector = (asteroids, laserLocation) => {
+	for(i=0; i < asteroids.length; i++) {
+		if(asteroids[i] === laserLocation) {
+			continue;
+		}
+		// sector 1
+		if(asteroids[i][0] >= laserLocation[0] && asteroids[i][1] < laserLocation[1]) {
+			s1.push(asteroids[i]);
+			continue;
+		};
+		// sector 2
+		if(asteroids[i][0] > laserLocation[0] && asteroids[i][1] >= laserLocation[1]) {
+			s2.push(asteroids[i]);
+			continue;
+		};
+		// sector 3
+		if(asteroids[i][0] <= laserLocation[0] && asteroids[i][1] > laserLocation[1]) {
+			s3.push(asteroids[i]);
+			continue;
+		};
+		// sector 4
+		if(asteroids[i][0] < laserLocation[0] && asteroids[i][1] <= laserLocation[1]) {
+			s4.push(asteroids[i]);
+			continue;
+		};
+	}
+};
 
+sortAsteroidsBySector(asteroids, laserLocation);
 
+console.log(">>> total adteroids in sectors >>> ", s1.length + s2.length + s3.length + s4.length);
 
 
 </script>
