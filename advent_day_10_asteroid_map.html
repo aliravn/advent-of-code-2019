@@ -8,7 +8,7 @@
 	<div id="output"></div>
 
 <script>
-    const mapGrid = ["..#..###....#####....###........#",".##.##...#.#.......#......##....#","#..#..##.#..###...##....#......##","..####...#..##...####.#.......#.#","...#.#.....##...#.####.#.###.#..#","#..#..##.#.#.####.#.###.#.##.....","#.##...##.....##.#......#.....##.",".#..##.##.#..#....#...#...#...##.",".#..#.....###.#..##.###.##.......",".##...#..#####.#.#......####.....","..##.#.#.#.###..#...#.#..##.#....",".....#....#....##.####....#......",".#..##.#.........#..#......###..#","#.##....#.#..#.#....#.###...#....",".##...##..#.#.#...###..#.#.#..###",".#..##..##...##...#.#.#...#..#.#.",".#..#..##.##...###.##.#......#...","...#.....###.....#....#..#....#..",".#...###..#......#.##.#...#.####.","....#.##...##.#...#........#.#...","..#.##....#..#.......##.##.....#.",".#.#....###.#.#.#.#.#............","#....####.##....#..###.##.#.#..#.","......##....#.#.#...#...#..#.....","...#.#..####.##.#.........###..##",".......#....#.##.......#.#.###...","...#..#.#.........#...###......#.",".#.##.#.#.#.#........#.#.##..#...",".......#.##.#...........#..#.#...",".####....##..#..##.#.##.##..##...",".#.#..###.#..#...#....#.###.#..#.","............#...#...#.......#.#..",".........###.#.....#..##..#.##..."];
+    const mapGrid = ["..#..###....#####....###........#", ".##.##...#.#.......#......##....#", "#..#..##.#..###...##....#......##","..####...#..##...####.#.......#.#","...#.#.....##...#.####.#.###.#..#","#..#..##.#.#.####.#.###.#.##.....","#.##...##.....##.#......#.....##.",".#..##.##.#..#....#...#...#...##.",".#..#.....###.#..##.###.##.......",".##...#..#####.#.#......####.....","..##.#.#.#.###..#...#.#..##.#....",".....#....#....##.####....#......",".#..##.#.........#..#......###..#","#.##....#.#..#.#....#.###...#....",".##...##..#.#.#...###..#.#.#..###",".#..##..##...##...#.#.#...#..#.#.",".#..#..##.##...###.##.#......#...","...#.....###.....#....#..#....#..",".#...###..#......#.##.#...#.####.","....#.##...##.#...#........#.#...","..#.##....#..#.......##.##.....#.",".#.#....###.#.#.#.#.#............","#....####.##....#..###.##.#.#..#.","......##....#.#.#...#...#..#.....","...#.#..####.##.#.........###..##",".......#....#.##.......#.#.###...","...#..#.#.........#...###......#.",".#.##.#.#.#.#........#.#.##..#...",".......#.##.#...........#..#.#...",".####....##..#..##.#.##.##..##...",".#.#..###.#..#...#....#.###.#..#.","............#...#...#.......#.#..",".........###.#.....#..##..#.##..."];
 
 	// function to translate puzzle input into coordinates of all asteroids
     translateMapIntoCoordinates = (grid) => {
@@ -24,63 +24,54 @@
 		return coordinates;
 	};
 	const asteroids = translateMapIntoCoordinates(mapGrid);
-	//console.log(">>> asteroids >>> ", asteroids);
 
-	// find all possible angles for all asteroids
-	getCosinusForEachAsteroidPair = (asteroids) => {
+	// calculate angle between 2 vectors, need coordinates as parameters
+	getAngleBetweenPoints = (endPt1, connectingPt, endPt2) => {
+		let x1 = endPt1[0] - connectingPt[0]; //Vector 1 - x
+		let y1 = endPt1[1] - connectingPt[1]; //Vector 1 - y
+
+		let x2 = endPt2[0] - connectingPt[0]; //Vector 2 - x
+		let y2 = endPt2[1] - connectingPt[1]; //Vector 2 - y
+
+		let angle = Math.atan2(y1, x1) - Math.atan2(y2, x2);
+		angle = angle * 360 / (2*Math.PI);
+
+		if(angle < 0) {
+			angle += 360;
+		}
+
+		return angle;
+	}
+
+
+	// find all unique angles for all asteroids
+	getListOfUniqueAnglesForEachAsteroidPair = (asteroids) => {
 		let result = [];
 		for (let j = 0; j < asteroids.length; j++) {
-			let anglesForEachAsteroid = [];
+			let anglesForEachAsteroid = {};
 			const asteroid = asteroids[j];
 			for (let i = 0; i < asteroids.length; i++) {
 				// check if it is the same asteroid, then no calc is needed
 				if (i === j) { continue; }
-				const a = Math.sqrt(
-					Math.pow((-1 - asteroid[0]), 2)
-				);
-				const b = Math.sqrt(
-					Math.pow((asteroid[0] - asteroids[i][0]), 2) +
-					Math.pow((asteroid[1] - asteroids[i][1]), 2)
-				);
-				const c = Math.sqrt(
-					Math.pow((-1 - asteroids[i][0]), 2) +
-					Math.pow((asteroid[1] - asteroids[i][1]), 2)
-				);
-				let cos = Number(((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b)).toFixed(4));
 
-				// check if asteroids are on the same axis, but in different directions
-				if (asteroid[1] > asteroids[i][1]) {
-					cos = `a${cos}`;
-				} else if (asteroid[1] < asteroids[i][1]) {
-					cos = `b${cos}`;
-				} else if (asteroid[0] > asteroids[i][0]) {
-					cos = `c${cos}`;
-				}else if (asteroid[0] < asteroids[i][0]) {
-					cos = `d${cos}`;
-				}
-				anglesForEachAsteroid.push(cos);
+				// first vector is pointing straight up and all angles are calculated from it
+				const angle = getAngleBetweenPoints([asteroid[0], asteroid[1] + 10], asteroid, asteroids[i]);
+
+				anglesForEachAsteroid[angle] = true;
 			}
 			result[j] = anglesForEachAsteroid;
 		}
 		return result;
 	};
-	const listOfAllAngles = getCosinusForEachAsteroidPair(asteroids);
-	// console.log(">>> listOfAllAngles >>>", listOfAllAngles);
+	const listOfAllAngles = getListOfUniqueAnglesForEachAsteroidPair(asteroids);
 
-	// find number of unique angles for each asteroid
-	const countList = [];
-	for (let i = 0; i < listOfAllAngles.length; i++) {
-		const unique = listOfAllAngles[i].filter((v, i, a) => a.indexOf(v) === i);
-		countList.push(unique.length);
-	}
-	// console.log(countList);
+	const numberOfAsteroidsDetectedFromEachPoint = listOfAllAngles.map((entry) => Object.keys(entry).length);
 
-	// find the asteroid, that can detect max number of other asteroids
-	const max = Math.max(...countList);
-	document.getElementById('output').innerHTML = `Max detected asteroids: ${max}`;
+	const maxAsteroidsDetected = Math.max(...numberOfAsteroidsDetectedFromEachPoint);
+	document.getElementById('output').innerHTML = `Max detected asteroids: ${maxAsteroidsDetected}`;
 
 	// get location of the asteroid, where to place the laser and the station
-	const where = countList.indexOf(max);
+	const where = numberOfAsteroidsDetectedFromEachPoint.indexOf(maxAsteroidsDetected);
 	const laserLocation = asteroids[where];
 	console.log(`Laser should be placed at: (${laserLocation})` ); // coordinates of the station
 
@@ -101,99 +92,8 @@
 
 // const laserLocation = asteroids[where];
 // const laserLocation = [27,19];
-let s1=[], s2=[], s3=[], s4=[];
-
-sortAsteroidsBySector = (asteroids, laserLocation) => {
-	for(i=0; i < asteroids.length; i++) {
-		if(asteroids[i] === laserLocation) {
-			continue;
-		}
-		// sector 1
-		if(asteroids[i][0] >= laserLocation[0] && asteroids[i][1] < laserLocation[1]) {
-			s1.push(asteroids[i]);
-			continue;
-		};
-		// sector 2
-		if(asteroids[i][0] > laserLocation[0] && asteroids[i][1] >= laserLocation[1]) {
-			s2.push(asteroids[i]);
-			continue;
-		};
-		// sector 3
-		if(asteroids[i][0] <= laserLocation[0] && asteroids[i][1] > laserLocation[1]) {
-			s3.push(asteroids[i]);
-			continue;
-		};
-		// sector 4
-		if(asteroids[i][0] < laserLocation[0] && asteroids[i][1] <= laserLocation[1]) {
-			s4.push(asteroids[i]);
-			continue;
-		};
-	}
-};
-
-sortAsteroidsBySector(asteroids, laserLocation);
-
-getCosinusForEachAsteroidinSector = (asteroidsPerSector, laserLocation) => {
-	let asteroidMap = {};
-
-	for (let i = 0; i < asteroidsPerSector.length; i++) {
-		const a = Math.sqrt(
-			Math.pow((-1 - laserLocation[0]), 2)
-		);
-		const b = Math.sqrt(
-			Math.pow((laserLocation[0] - asteroidsPerSector[i][0]), 2) +
-			Math.pow((laserLocation[1] - asteroidsPerSector[i][1]), 2)
-		);
-		const c = Math.sqrt(
-			Math.pow((-1 - asteroidsPerSector[i][0]), 2) +
-			Math.pow((laserLocation[1] - asteroidsPerSector[i][1]), 2)
-		);
-		const cos = Number(((Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b)).toFixed(4));
-
-		asteroidMap[i] = asteroidsPerSector[i];
-		// need to replace [i] with JSON.stringify(cos)
-		// need to check first, if this cos key already exists 
-		// need to check if the coordinates coming with this key are closer to the laser or not
-		// if coordinates are nearer than existion ones - replace, if not - ignore and moe to the next one
-		console.log("asteroidMap", asteroidMap);
-		console.log("asteroidMap", Object.keys(asteroidMap).length);
-		console.log(s1.length);
-	}
-	return asteroidMap;
-};
-
-const s1cos = getCosinusForEachAsteroidinSector(s1, laserLocation);
 
 
-findAsteroidsOnSameAxis = (astroidsPerSector, cosPerSector, laserLocation) => {
-	let nearestPerSector = [];
-	for(j=0; j < (cosPerSector.length); j++) {
-	for(i=0; i < (cosPerSector.length - 1); i++) {
-		const match = cosPerSector.indexOf(cosPerSector[i], i+1);
-
-		if(match < 0) {
-			nearestPerSector[i] = astroidsPerSector[i];
-			continue;
-		}
-
-		if(match) {
-			const x1 = Math.abs(laserLocation[0] - astroidsPerSector[i][0]);
-			const x2 = Math.abs(laserLocation[0] - astroidsPerSector[match][0]);
-			const y1 = Math.abs(laserLocation[1] - astroidsPerSector[i][1]);
-			const y2 = Math.abs(laserLocation[1] - astroidsPerSector[match][1]);
-			
-			if( x1 < x2 && y1 < y2) { // nearest asteroid
-				nearestPerSector.push(astroidsPerSector[i]);
-			}
-		}
-	}
-}
-	return nearestPerSector;
-};
-
-//const uniquePerSector = findAsteroidsOnSameAxis(s1, s1cos, laserLocation)
-
-//console.log(uniquePerSector);
 
 </script>
 </body>
