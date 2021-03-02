@@ -5,10 +5,44 @@
 </head>
 
 <body>
-	<div id="output"></div>
+	<div id="output-part1"></div>
+	<div id="output-part2"></div>
 
 <script>
-    const mapGrid = ["..#..###....#####....###........#", ".##.##...#.#.......#......##....#", "#..#..##.#..###...##....#......##","..####...#..##...####.#.......#.#","...#.#.....##...#.####.#.###.#..#","#..#..##.#.#.####.#.###.#.##.....","#.##...##.....##.#......#.....##.",".#..##.##.#..#....#...#...#...##.",".#..#.....###.#..##.###.##.......",".##...#..#####.#.#......####.....","..##.#.#.#.###..#...#.#..##.#....",".....#....#....##.####....#......",".#..##.#.........#..#......###..#","#.##....#.#..#.#....#.###...#....",".##...##..#.#.#...###..#.#.#..###",".#..##..##...##...#.#.#...#..#.#.",".#..#..##.##...###.##.#......#...","...#.....###.....#....#..#....#..",".#...###..#......#.##.#...#.####.","....#.##...##.#...#........#.#...","..#.##....#..#.......##.##.....#.",".#.#....###.#.#.#.#.#............","#....####.##....#..###.##.#.#..#.","......##....#.#.#...#...#..#.....","...#.#..####.##.#.........###..##",".......#....#.##.......#.#.###...","...#..#.#.........#...###......#.",".#.##.#.#.#.#........#.#.##..#...",".......#.##.#...........#..#.#...",".####....##..#..##.#.##.##..##...",".#.#..###.#..#...#....#.###.#..#.","............#...#...#.......#.#..",".........###.#.....#..##..#.##..."];
+	const mapGrid = [
+		"..#..###....#####....###........#",
+		".##.##...#.#.......#......##....#", 
+		"#..#..##.#..###...##....#......##",
+		"..####...#..##...####.#.......#.#",
+		"...#.#.....##...#.####.#.###.#..#",
+		"#..#..##.#.#.####.#.###.#.##.....",
+		"#.##...##.....##.#......#.....##.",
+		".#..##.##.#..#....#...#...#...##.",
+		".#..#.....###.#..##.###.##.......",
+		".##...#..#####.#.#......####.....",
+		"..##.#.#.#.###..#...#.#..##.#....",
+		".....#....#....##.####....#......",
+		".#..##.#.........#..#......###..#",
+		"#.##....#.#..#.#....#.###...#....",
+		".##...##..#.#.#...###..#.#.#..###",
+		".#..##..##...##...#.#.#...#..#.#.",
+		".#..#..##.##...###.##.#......#...",
+		"...#.....###.....#....#..#....#..",
+		".#...###..#......#.##.#...#.####.",
+		"....#.##...##.#...#........#.#...",
+		"..#.##....#..#.......##.##.....#.",
+		".#.#....###.#.#.#.#.#............",
+		"#....####.##....#..###.##.#.#..#.",
+		"......##....#.#.#...#...#..#.....",
+		"...#.#..####.##.#.........###..##",
+		".......#....#.##.......#.#.###...",
+		"...#..#.#.........#...###......#.",
+		".#.##.#.#.#.#........#.#.##..#...",
+		".......#.##.#...........#..#.#...",
+		".####....##..#..##.#.##.##..##...",
+		".#.#..###.#..#...#....#.###.#..#.",
+		"............#...#...#.......#.#..",
+		".........###.#.....#..##..#.##..."];
 
 	// function to translate puzzle input into coordinates of all asteroids
     translateMapIntoCoordinates = (grid) => {
@@ -55,7 +89,7 @@
 				if (i === j) { continue; }
 
 				// first vector is pointing straight up and all angles are calculated from it
-				const angle = getAngleBetweenPoints([asteroid[0], asteroid[1] + 10], asteroid, asteroids[i]);
+				const angle = getAngleBetweenPoints([asteroid[0], asteroid[1] - 1], asteroid, asteroids[i]);
 
 				anglesForEachAsteroid[angle] = true;
 			}
@@ -68,32 +102,74 @@
 	const numberOfAsteroidsDetectedFromEachPoint = listOfAllAngles.map((entry) => Object.keys(entry).length);
 
 	const maxAsteroidsDetected = Math.max(...numberOfAsteroidsDetectedFromEachPoint);
-	document.getElementById('output').innerHTML = `Max detected asteroids: ${maxAsteroidsDetected}`;
+	document.getElementById('output-part1').innerHTML = `Max detected asteroids: ${maxAsteroidsDetected}`;
 
 	// get location of the asteroid, where to place the laser and the station
 	const where = numberOfAsteroidsDetectedFromEachPoint.indexOf(maxAsteroidsDetected);
+	
 	const laserLocation = asteroids[where];
 	console.log(`Laser should be placed at: (${laserLocation})` ); // coordinates of the station
 
 // PART 2 STARTS HERE
 
-// 1) sort all asteroids by 4 sectors based on their coordinates / done
-// 2) inside the sector: 
-// 		- calc COS to the station
-//		- find matching COS
-// 		- find which of matches is closer to the station (will be detected first)
-//		- remove the matches that are far away
-// 		- determine the number of asteroids in sector
-// 3) determine in which sector the 200th asteroid will be (
-//	  eg. if 1st sector doesn't have 200 detected asteroids, it will be cleaned first and we don't care in which order
+// 1) calculate all angles => done
+// 2) put them in a list with angle as 'key' and array of asteroids(coordinates) as 'value' => done
+// 3) sort keys inside the object from 0 to 360
 // 4) sort the asteroids within selected sector by ascending(180-360)/descending(0-180) COS
 // 5) find the one that matches the 200th position
-
 
 // const laserLocation = asteroids[where];
 // const laserLocation = [27,19];
 
+	// get all asteroids sorted by their angles
+	getAllUniqueAnglesWithAllAsteroidsThatHaveIt = (asteroids) => {
+		let anlesForAllAsteroids = {};
+			for (let i = 0; i < asteroids.length; i++) {
+				// skip the laserLocation asteroid
+				if (i === where) { 
+					continue; 
+				}
+				// first vector is pointing straight up and all angles are calculated from it
+				const angle = getAngleBetweenPoints([laserLocation[0], laserLocation[1] - 10], laserLocation, asteroids[i]);
 
+				// if there is already asteroid on this angle exist, add the next one to the list
+				// if it is the first asteroid on this line, then add the angle and the asteroid 
+				if (angle in anlesForAllAsteroids) {
+					anlesForAllAsteroids[angle].push(asteroids[i]);
+				} else {anlesForAllAsteroids[angle] = [asteroids[i]]}
+
+
+			}
+		return anlesForAllAsteroids;
+	};
+
+	const showMeTheAsteroids = getAllUniqueAnglesWithAllAsteroidsThatHaveIt(asteroids);
+
+	// find the  angle 
+	const indexToLookFor = 100;
+	const findTheAngle = Object.keys(showMeTheAsteroids).find((key, index) => index === indexToLookFor);
+	// console.log(">>> findThe220thAngle", findThe220thAngle);
+	console.log(">>> showMeTheAsteroids[findThe220thAngle]", showMeTheAsteroids);
+
+	// check if angle has only asteroid, return it, if more = sort the array and return the 1st item
+	weAreGettingCloser = (showMeTheAsteroids) => {
+		const asteroidsPerAngle = showMeTheAsteroids[findTheAngle];
+		if(asteroidsPerAngle.length === 1) {
+			return asteroidsPerAngle;
+		}
+		
+	};
+
+	const foundIt = weAreGettingCloser(showMeTheAsteroids);
+	console.log(">>> foundIt >>>", foundIt);
+
+	getTheBloodyResult = (location) => {
+		let calculation = location[0] * 100 + location[1];
+		return calculation;
+	}
+
+	const aaaandFinally = getTheBloodyResult(foundIt[0]);
+	console.log(">>> aaaandFinally >>>", aaaandFinally);
 
 </script>
 </body>
