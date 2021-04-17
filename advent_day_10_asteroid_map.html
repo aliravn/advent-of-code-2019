@@ -104,26 +104,24 @@
 	const maxAsteroidsDetected = Math.max(...numberOfAsteroidsDetectedFromEachPoint);
 	document.getElementById('output-part1').innerHTML = `Max detected asteroids: ${maxAsteroidsDetected}`;
 
-	// get location of the asteroid, where to place the laser and the station
+	// get the position of asteroid with max. detectable other asteroids in the asteroids array
 	const where = numberOfAsteroidsDetectedFromEachPoint.indexOf(maxAsteroidsDetected);
 	
+	// get coordinates of the asteroid with max, detection, where to place the laser
 	const laserLocation = asteroids[where];
-	console.log(`Laser should be placed at: (${laserLocation})` ); // coordinates of the station
+	console.log(`Laser should be placed at: (${laserLocation})` ); 
 
 // PART 2 STARTS HERE
 
 // 1) calculate all angles => done
 // 2) put them in a list with angle as 'key' and array of asteroids(coordinates) as 'value' => done
-// 3) sort keys inside the object from 0 to 360
-// 4) sort the asteroids within selected sector by ascending(180-360)/descending(0-180) COS
-// 5) find the one that matches the 200th position
-
-// const laserLocation = asteroids[where];
-// const laserLocation = [27,19];
+// 3) sort keys inside the object from 0 to 360 and reverse it => done
+// 4) find the angle that matches the 200th position and get the array of asteroids on this angle
+// 5) check if this array has more than 1 asteroid and if so find the closest (X, Y) to laser location)
 
 	// get all asteroids sorted by their angles
-	getAllUniqueAnglesWithAllAsteroidsThatHaveIt = (asteroids) => {
-		let anlesForAllAsteroids = {};
+	getListOfAllUniqueAnglesWithAsteroidsOnEachOfThem = (asteroids) => {
+		let allAsteroidsSortedByAngles = {};
 			for (let i = 0; i < asteroids.length; i++) {
 				// skip the laserLocation asteroid
 				if (i === where) { 
@@ -134,42 +132,62 @@
 
 				// if there is already asteroid on this angle exist, add the next one to the list
 				// if it is the first asteroid on this line, then add the angle and the asteroid 
-				if (angle in anlesForAllAsteroids) {
-					anlesForAllAsteroids[angle].push(asteroids[i]);
-				} else {anlesForAllAsteroids[angle] = [asteroids[i]]}
-
-
+				
+				if (angle in allAsteroidsSortedByAngles) {
+					allAsteroidsSortedByAngles[parseInt(angle*1000)].push(asteroids[i]);
+				} else {
+					allAsteroidsSortedByAngles[parseInt(angle*1000)] = [asteroids[i]]
+				}
 			}
-		return anlesForAllAsteroids;
+		return allAsteroidsSortedByAngles;
 	};
 
-	const showMeTheAsteroids = getAllUniqueAnglesWithAllAsteroidsThatHaveIt(asteroids);
+	const showMeTheAsteroids = getListOfAllUniqueAnglesWithAsteroidsOnEachOfThem(asteroids);
 
-	// find the  angle 
-	const indexToLookFor = 100;
-	const findTheAngle = Object.keys(showMeTheAsteroids).find((key, index) => index === indexToLookFor);
-	// console.log(">>> findThe220thAngle", findThe220thAngle);
-	console.log(">>> showMeTheAsteroids[findThe220thAngle]", showMeTheAsteroids);
+	// sort keys(angles) inside the object in ascending order
+	const showMeTheAsteroidsOrdered = Object.keys(showMeTheAsteroids).sort().reduce(
+  		(obj, key) => { 
+    		obj[key] = showMeTheAsteroids[key]; 
+    		return obj;
+  			}, 
+  		{}
+	);
 
-	// check if angle has only asteroid, return it, if more = sort the array and return the 1st item
-	weAreGettingCloser = (showMeTheAsteroids) => {
-		const asteroidsPerAngle = showMeTheAsteroids[findTheAngle];
-		if(asteroidsPerAngle.length === 1) {
-			return asteroidsPerAngle;
+	// need to reverse the order, because the angles are calculated counter clockwise
+	const reverseShowMeTheAsteroidsOrdered = Object.keys(showMeTheAsteroidsOrdered).reverse();
+
+	// find the angle that has the 200th detected asteroid and get the array of asteroids on this angle
+	const angleWithAsteroid200 = reverseShowMeTheAsteroidsOrdered[198];
+	const asteroidsOnAngle200 = showMeTheAsteroidsOrdered[angleWithAsteroid200.toString()];
+
+	getAsteroidClosestToLaser = (arrayOfAsteroids, laserLocation) => {
+		if(arrayOfAsteroids.length === 1) {
+			return arrayOfAsteroids[0];
 		}
-		
-	};
 
-	const foundIt = weAreGettingCloser(showMeTheAsteroids);
-	console.log(">>> foundIt >>>", foundIt);
+		let coordinates;
+		let diffX = Math.abs(laserLocation[0] - arrayOfAsteroids[i][0]); 
+		let diffY = Math.abs(laserLocation[1] - arrayOfAsteroids[i][1]); 
+		for (i = 1; i < arrayOfAsteroids.length; i++) {
 
+			let newDiffX = Math.abs(laserLocation[0] - arrayOfAsteroids[i][0]);
+			let newDiffY = Math.abs(laserLocation[1] - arrayOfAsteroids[i][1]);
+			if( newDiffX <= diffX && newDiffY <= diffY ) {
+				coordinates = [arrayOfAsteroids[i][0], arrayOfAsteroids[i][1]];
+			}
+		}
+		return coordinates;
+	}
+
+	const foundIt = getAsteroidClosestToLaser(asteroidsOnAngle200); 
+	
 	getTheBloodyResult = (location) => {
 		let calculation = location[0] * 100 + location[1];
 		return calculation;
 	}
 
-	const aaaandFinally = getTheBloodyResult(foundIt[0]);
-	console.log(">>> aaaandFinally >>>", aaaandFinally);
+	const result = getTheBloodyResult(foundIt);
+	document.getElementById('output-part2').innerHTML = `The number we are looking for is : ${result}`;
 
 </script>
 </body>
